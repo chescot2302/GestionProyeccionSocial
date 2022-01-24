@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="rptProyectoxEstado" language="groovy" pageWidth="595" pageHeight="842" columnWidth="483" leftMargin="56" rightMargin="56" topMargin="56" bottomMargin="56">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="ID_ESTADO" class="java.math.BigDecimal"/>
+	<parameter name="FECHA_INI" class="java.lang.String"/>
+	<parameter name="FECHA_FIN" class="java.lang.String"/>
+	<parameter name="DESC_ESTADO" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT PRO.ID,PRO.DESCRIPCION,'3. DOCUMENTOS DE REFERENCIA:' AS CABECERA,TD.SIGLAS||' N° '||doc.numero||'-'||doc.anno||'/'||doc.procedencia AS DATO FROM PROYECTO PRO INNER JOIN DOCUMENTO DOC
+ON doc.id_proyecto=PRO.ID INNER JOIN TIPO_DOCUMENTO TD ON TD.ID=doc.id_tipo_doc
+INNER JOIN ESTPROY EP ON EP.ID_PROYECT=PRO.ID AND EP.ID_ESTADO=$P{ID_ESTADO} AND EP.FECHA>=TO_DATE($P{FECHA_INI},'DD/MM/YYYY') AND EP.FECHA<=TO_DATE($P{FECHA_FIN},'DD/MM/YYYY')
+UNION
+SELECT PRO.ID,PRO.DESCRIPCION,'1. SOLICITADO EL:' AS CABECERA,TO_CHAR(pro.fecha_sol,'DD/MM/YYYY') AS DATO FROM PROYECTO PRO
+INNER JOIN ESTPROY EP ON EP.ID_PROYECT=PRO.ID AND EP.ID_ESTADO=$P{ID_ESTADO} AND EP.FECHA>=TO_DATE($P{FECHA_INI},'DD/MM/YYYY') AND EP.FECHA<=TO_DATE($P{FECHA_FIN},'DD/MM/YYYY')
+UNION
+SELECT PRO.ID,PRO.DESCRIPCION,'4. DOCENTES RESPONSABLES:' AS CABECERA,'FAC: '||FAC.SIGLAS||'   ESC: '||ESC.DESCRIPCION||'   '||GRAD.SIGLAS||' '||doce.appaterno||' '||doce.apmaterno||', '||doce.nombres AS DATO  FROM PROYECTO PRO INNER JOIN PROYDOC PD
+ON PD.ID_PROYECTO=PRO.ID INNER JOIN DOCENTE DOCE ON PD.ID_DOCENTE=DOCE.ID INNER JOIN GRADO GRAD ON GRAD.ID=DOCE.ID_GRADO INNER JOIN ESCUELA ESC ON
+ESC.ID=DOCE.ID_ESCUELA INNER JOIN FACULTAD FAC ON FAC.ID=ESC.ID_FACULTAD
+INNER JOIN ESTPROY EP ON EP.ID_PROYECT=PRO.ID AND EP.ID_ESTADO=$P{ID_ESTADO} AND EP.FECHA>=TO_DATE($P{FECHA_INI},'DD/MM/YYYY') AND EP.FECHA<=TO_DATE($P{FECHA_FIN},'DD/MM/YYYY')
+UNION
+SELECT PRO.ID,PRO.DESCRIPCION,'5. ESTUDIANTES RESPONSABLES:'AS CABECERA,'FAC: '||FAC.SIGLAS||'   ESC: '||ESC.DESCRIPCION||'   '||ESTU.appaterno||' '||ESTU.apmaterno||', '||ESTU.nombres AS DATO FROM PROYECTO PRO INNER JOIN PROYEST PE
+ON pe.id_proyecto=PRO.ID INNER JOIN ESTUDIANTE ESTU ON ESTU.ID=pe.id_estudiante INNER JOIN ESCUELA ESC ON
+ESC.ID=ESTU.ID_ESCUELA INNER JOIN FACULTAD FAC ON FAC.ID=ESC.ID_FACULTAD
+INNER JOIN ESTPROY EP ON EP.ID_PROYECT=PRO.ID AND EP.ID_ESTADO=$P{ID_ESTADO} AND EP.FECHA>=TO_DATE($P{FECHA_INI},'DD/MM/YYYY') AND EP.FECHA<=TO_DATE($P{FECHA_FIN},'DD/MM/YYYY')
+UNION
+SELECT PRO.ID,PRO.DESCRIPCION,'2. EMPRESA SOLICITANTE:' AS CABECERA,'RUC: '||SOL.RUC||'  RAZON SOCIAL: '||SOL.RAZON_SOCIAL AS DATO FROM PROYECTO PRO INNER JOIN SOLICITANTE SOL
+ON PRO.ID_SOLICITANTE=SOL.ID
+INNER JOIN ESTPROY EP ON EP.ID_PROYECT=PRO.ID AND EP.ID_ESTADO=$P{ID_ESTADO} AND EP.FECHA>=TO_DATE($P{FECHA_INI},'DD/MM/YYYY') AND EP.FECHA<=TO_DATE($P{FECHA_FIN},'DD/MM/YYYY')]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DESCRIPCION" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CABECERA" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DATO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<group name="PROYECTO">
+		<groupExpression><![CDATA[$F{ID}]]></groupExpression>
+		<groupHeader>
+			<band height="34">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="483" height="34"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Black" size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA['PROYECTO N° '+$F{ID}+': '+$F{DESCRIPCION}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="DETALLE">
+		<groupExpression><![CDATA[$F{CABECERA}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="0" y="0" width="483" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="Arial Black" size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA['   '+$F{CABECERA}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<title>
+		<band height="108" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="69" width="483" height="21"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA['Relación de Proyecto con estado: '+$P{DESC_ESTADO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="49" width="483" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Centro de Proyección Social y Extensión Universitaria]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="25" width="483" height="24"/>
+				<textElement textAlignment="Center">
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[Facultad de Ingeniería Civil, Sistemas y Arquitectura]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="90" width="483" height="18"/>
+				<textElement textAlignment="Center">
+					<font size="13" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA['Desde: '+$P{FECHA_INI}+'   '+'Hasta: '+$P{FECHA_FIN}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="483" height="25"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Universidad Nacional Pedro Ruiz Gallo]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="483" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial Narrow" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA['           '+$F{DATO}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
